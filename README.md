@@ -2,7 +2,23 @@
 
 Bienvenidos a la guía básica de análisis de Hash realizada gracias al [curso](https://www.coursera.org/learn/detection-and-response) de Google de Ciberseguridad 
 
-## Análisis
+Mas cosas a tener en cuenta cuando analizamos incidentes
+
+###  **Detección y Análisis (Detection and Analysis)**
+
+- **Indicadores de Compromiso (Indicators of Compromise - IoCs)**: Los IoCs son evidencia observable que sugiere la posibilidad de un incidente de seguridad. Ayudan a identificar quién y qué estuvo involucrado en un ataque después de que ha ocurrido, mientras que los Indicadores de Ataque (IoAs) se enfocan en encontrar el cómo y por qué de un ataque en tiempo real. La **Pirámide del Dolor** es un concepto que clasifica los IoCs en niveles de dificultad para los atacantes cuando se bloquean. Los niveles incluyen valores hash, direcciones IP, nombres de dominio, artefactos de red y host, herramientas, y tácticas, técnicas y procedimientos (TTPs), siendo los TTPs los más difíciles de detectar.
+- **Proceso de Triage**: El triage es el proceso de priorizar incidentes según su urgencia. Consta de tres pasos: recibir y evaluar las alertas, asignar prioridades según el impacto y la recuperabilidad, y finalmente, analizar y recopilar información sobre el incidente para tomar decisiones informadas. Este proceso permite a los equipos de seguridad responder de manera efectiva y eficiente a las alertas de seguridad, asignando los recursos necesarios para abordar los problemas más críticos primero.
+
+###  **Actividad Post-Incidente (Post-incident Activity)**
+
+- **Revisión Post-incidente (Post-incident Review)**: Después de contener, erradicar y recuperarse de un incidente, la fase de actividad post-incidente se centra en aprender de lo ocurrido para mejorar la respuesta en el futuro. Las **lecciones aprendidas** se discuten en reuniones que involucran a todas las partes implicadas, con el objetivo de identificar errores, brechas en los procesos y posibles mejoras. Estas reuniones generan **recomendaciones** que pueden incluir la actualización de procedimientos o la implementación de nuevas herramientas de seguridad.
+- **Informe Final**: Durante esta fase también se elabora un informe final que documenta todo lo ocurrido durante el incidente, incluyendo un resumen ejecutivo, una cronología detallada, un análisis de las acciones tomadas y una lista de recomendaciones para prevenir futuros incidentes similares. Este informe es clave para la transparencia y la mejora continua en la gestión de incidentes.
+
+
+
+
+
+## Actividad de Análisis
 
 **SHA256 file hash:** 54e6ea47eb04634d3e87fd7787e2136ccfbcc80ade34f246a12cf93bab527f6b
 
@@ -83,3 +99,6 @@ En la puntuación de la comunidad se puede observar una puntuación negativa, ot
 - **Tactics, techniques, and procedures (TTPs):** Esto lo podemos encontrar en la parte inferior de la pestaña Behavior
 
   <img align="center" src="/img/10ºimagenn.PNG"  />
+  
+  
+
