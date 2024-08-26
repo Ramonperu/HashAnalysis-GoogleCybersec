@@ -1,215 +1,85 @@
-# WireShark & TcpDump
+# Hash Analysis
 
-Bienvenidos a la guia basica de WireShark y TcpDump realizada gracias al [curso](https://www.coursera.org/learn/detection-and-response) de Google de Ciberseguridad 
+Bienvenidos a la guía básica de análisis de Hash realizada gracias al [curso](https://www.coursera.org/learn/detection-and-response) de Google de Ciberseguridad 
 
-## **Wireshark**
+## Análisis
 
-Wireshark es una herramienta gráfica de análisis de protocolos de red que permite capturar y analizar tráfico de red en tiempo real. Es utilizada por profesionales de la red **para diagnosticar problemas, analizar flujos de datos, y entender el funcionamiento de diferentes protocolos**.
+**SHA256 file hash:** 54e6ea47eb04634d3e87fd7787e2136ccfbcc80ade34f246a12cf93bab527f6b
+
+Vamos a utilizar la herramienta de análisis de virus total para identificar los indicadores de peligro (Indicators of Compromise) e introducirlos en la plantilla de Pirámide del Dolor
+
+------
+
+### Paso 1: Introducimos el hash en [VirusTotal](https://www.virustotal.com/gui/home/upload)
+
+
 
 <img align="center" src="/img/1ºimagenn.PNG"  />
 
-### **Uso de Filtros en Wireshark**
+------
 
-Wireshark ofrece dos tipos principales de filtros: **filtros de captura** y **filtros de visualización**. Estos filtros son esenciales para manejar grandes volúmenes de datos, permitiendo enfocar el análisis en el tráfico relevante.
+### Paso 2: Analisis del informe de VirusTotal
 
 
 
-1. **Filtros de Captura:** Los filtros de captura se aplican antes de iniciar la captura de tráfico, limitando los datos que se almacenan. Wireshark utiliza la sintaxis de los Filtros de Paquetes Berkeley (BPF) para definir estos filtros.
+**Detección:** Esta pestaña muestra una lista de proveedores de seguridad y sus veredictos sobre un artefacto, como si es malicioso, sospechoso o inseguro. Observa cuántos proveedores han marcado este hash como malicioso.
 
-   Ejemplos comunes:
+<img align="center" src="/img/2ºimagenn.PNG"  />
 
-   - Capturar tráfico de una IP específica:
+**Detalles:** Aquí se ofrece información adicional, incluyendo hashes relacionados como MD5 y SHA-1.
 
-     ```
-     host 192.168.1.1
-     ```
+<img align="center" src="/img/3ºimagenn.PNG"  />
 
-   - Capturar tráfico TCP en un puerto específico:
+**Relaciones:** Esta pestaña contiene datos sobre las conexiones de red del malware con URLs, dominios y direcciones IP, indicando cuántos proveedores han marcado estas conexiones como maliciosas.
 
-     ```
-     tcp port 80
-     ```
+<img align="center" src="/img/4ºimagenn.PNG"  />
 
-   - Capturar solo tráfico ICMP (ping):
+**Comportamiento:** Muestra información sobre la actividad observada del malware al ejecutarlo en un entorno aislado, detallando acciones en el registro, sistema de archivos, procesos, y las tácticas y técnicas empleadas.
 
-     ```
-     icmp
-     ```
+<img align="center" src="/img/5ºimagenn.PNG"  />
 
-   - Capturar tráfico entre dos hosts específicos:
+------
 
-     ```
-     host 192.168.1.1 and host 192.168.1.2
-     ```
+### Paso 3: Determinar si es malcioso
 
-2. **Filtros de Visualización:** Los filtros de visualización se aplican a los datos ya capturados, permitiendo filtrar la visualización en la interfaz gráfica sin afectar la captura en sí. Estos filtros son más flexibles y utilizan una sintaxis específica de Wireshark.
+Podemos determinar si es malicioso de la siguiente manera:
 
-   Ejemplos comunes:
+En la primera pagina podemos ver que distintos proveedores de seguridad lo identifican como malicioso, concretamente mas de 50 proveedores
 
-   - Filtrar por dirección IP de origen o destino:
+En la puntuación de la comunidad se puede observar una puntuación negativa, otro indicativo de que puede ser malicioso. 
 
-     ```
-     ip.addr == 192.168.1.1
-     ```
+------
 
-   - Filtrar tráfico HTTP:
+### Paso 4: Identificacion de indicadores de compromiso en la Piramide
 
-     ```
-     http
-     ```
+- **Hash value:**  Otro hash para identificar a este archivo malicioso es el que podemos ver dentro de la pestaña **detalles** en MD5 O SHA-1
 
-   - Filtrar por puerto TCP específico:
+  Luego estos dos hash tambien identifican a este archivo:
 
-     ```
-     tcp.port == 443
-     ```
+  ***MD5 287d612e29b71c90aa54947313810a25***
 
-   - Filtrar paquetes que contienen un string específico en el contenido:
+   ***SHA-1 8f35a9e70dbec8f1904991773f394cd4f9a07f5e***
 
-     ```
-     frame contains "password"
-     ```
+- **IP address**: Podemos encontrar las IPs contactadas en la seccion de **Relaciones**
 
-   - Filtrar por dirección MAC:
+<img align="center" src="/img/6ºimagenn.PNG"  />
 
-     ```
-     eth.addr == 00:11:22:33:44:55
-     ```
+- **Domain name:** Podemos encontrarlo en la parte de detalles filtrando por detecciones
 
-   - Filtrar tráfico de un protocolo específico, como DNS:
+  <img align="center" src="/img/7ºimagenn.PNG"  />
 
-     ```
-     dns
-     ```
+  Ademas si seguimos buscando encontramos los siguientes dominios agectados: misecure.com / org.misecure.com / res.public.onecdn.static.microsoft ...
 
-3. **Uso avanzado de filtros:**
+  
 
-   - Combinación de filtros:
+- **Network artifact/host artifact:** Nos dirijimos a la parte de comportamiento y bajamos a la seccion de Network Communication para entender el comportamiento en las redes despues de ejecutar el archivo
 
-      Se pueden combinar múltiples condiciones usando operadores lógicos como and, or, y not.
+  <img align="center" src="/img/8ºimagenn.PNG"  />
 
-     ```
-     ip.src == 192.168.1.1 and tcp.port == 80
-     ```
+  Como podemos ver hay diferentes HTTP Request
 
-   - Seguimiento de flujos TCP:
+- **Tools:** No podemos determinar ninguna herramienta en concreto pero segun la pestaña de detalles el archivo captura la entrada introducida por los usuarios <img align="center" src="/img/9ºimagenn.PNG"  />
 
-      Para analizar el flujo completo de una sesión TCP:
+- **Tactics, techniques, and procedures (TTPs):** Esto lo podemos encontrar en la parte inferior de la pestaña Behavior
 
-     - Selecciona un paquete en la ventana de captura.
-     - Clic derecho y selecciona "Follow" > "TCP Stream". Esto mostrará la conversación completa en una ventana separada.
-
-## **Tcpdump**
-
-tcpdump es una herramienta de línea de comandos que permite capturar y analizar paquetes de red en tiempo real. Es muy utilizada en entornos de servidor y en situaciones donde se necesita una herramienta ligera y poderosa para capturar tráfico sin necesidad de una interfaz gráfica.
-
-### **Comandos y Uso Básico de tcpdump**
-
-tcpdump tiene una amplia variedad de opciones y parámetros que permiten capturar y analizar tráfico de red de manera muy detallada. A continuación se detallan algunos de los comandos más básicos y su uso.
-
-1. **Iniciar captura en una interfaz específica:**
-
-   ```
-   tcpdump -i eth0
-   ```
-
-   Este comando captura tráfico en la interfaz `eth0`. Se puede reemplazar `eth0` con la interfaz de red que desees monitorear.
-
-2. **Mostrar la lista de interfaces disponibles:**
-
-   ```
-   tcpdump -D
-   ```
-
-   Muestra las interfaces de red disponibles en el sistema.
-
-3. **Capturar tráfico de un host específico:**
-
-   ```
-   tcpdump host 192.168.1.1
-   ```
-
-   Captura todo el tráfico proveniente o destinado a la IP `192.168.1.1`.
-
-4. **Filtrar tráfico por puerto:**
-
-   ```
-   tcpdump port 80
-   ```
-
-   Captura tráfico en el puerto `80` (normalmente HTTP). Puedes especificar otros puertos según sea necesario.
-
-5. **Guardar la captura en un archivo:**
-
-   ```
-   tcpdump -w capture.pcap
-   ```
-
-   Este comando guarda la captura en un archivo llamado `capture.pcap`, que puede ser analizado posteriormente con tcpdump o Wireshark.
-
-6. **Leer un archivo de captura:**
-
-   ```
-   tcpdump -r capture.pcap
-   ```
-
-   Lee y analiza el contenido de un archivo de captura `capture.pcap`.
-
-7. **Mostrar más detalles de los paquetes capturados:**
-
-   ```
-   tcpdump -v
-   ```
-
-   Usa la opción `-v` (verbose) para obtener más detalles sobre cada paquete capturado. Puedes usar `-vv` para aún más detalles.
-
-8. **Capturar solo el comienzo de cada paquete:**
-
-   ```
-   tcpdump -s 64
-   ```
-
-   Captura solo los primeros 64 bytes de cada paquete, lo que es útil si solo necesitas las cabeceras y quieres ahorrar espacio en el archivo de captura.
-
-9. **Combinar filtros:**
-
-   - Capturar tráfico HTTP desde un host específico:
-
-     ```
-     tcpdump tcp port 80 and host 192.168.1.1
-     ```
-
-   - Capturar tráfico TCP excepto de un puerto específico:
-
-     ```
-     tcpdump tcp and not port 22
-     ```
-
-10. **Mostrar tráfico en formato legible (conversión de nombres de dominio y puertos):**
-
-    ```
-    tcpdump -n
-    ```
-
-    La opción `-n` evita la resolución de nombres de host y puertos, mostrando las direcciones IP y números de puerto en lugar de nombres de dominio o servicios.
-
-## **Similitudes y Diferencias entre Wireshark y tcpdump**
-
-**Similitudes:**
-
-- Ambos son poderosos analizadores de tráfico de red y pueden capturar y analizar paquetes.
-- Usan el formato `.pcap` para almacenar capturas, lo que permite intercambiar archivos entre ambas herramientas.
-- Soportan filtros para seleccionar tráfico específico, aunque Wireshark tiene una interfaz más amigable para construir y aplicar filtros.
-
-**Diferencias:**
-
-- Interfaz de Usuario:
-  - Wireshark tiene una GUI intuitiva, lo que facilita el análisis visual y la navegación por los datos.
-  - tcpdump es una herramienta de línea de comandos, más adecuada para entornos sin GUI o donde se requiere una herramienta ligera.
-- Recursos:
-  - Wireshark es más pesado en términos de consumo de CPU y memoria, especialmente en capturas grandes.
-  - tcpdump es mucho más eficiente y puede ejecutarse en sistemas con recursos limitados.
-- Funcionalidad Adicional:
-  - Wireshark ofrece herramientas adicionales como gráficos de tiempo, análisis estadístico, y decodificación avanzada de protocolos.
-  - tcpdump se centra en la captura y análisis básico, siendo ideal para scripts y automatización.
-
+  <img align="center" src="/img/10ºimagenn.PNG"  />
